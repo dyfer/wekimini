@@ -189,7 +189,7 @@ public final class WekiMiniRunner {
                         if (args.length == 0) WekiMiniRunner.getInstance().runNewProject();
                         else {
                             try {
-                                WekiMiniRunner.getInstance().runFromFile(projectPath);
+                                WekiMiniRunner.getInstance().runFromFile(projectPath, false);
                             } catch(Exception e) {
                                 logger.log(Level.SEVERE, "Error opening project \"" + projectPath + "\"");
                             }
@@ -264,12 +264,13 @@ public final class WekiMiniRunner {
         System.exit(0); //Too late to go back
     }
 
-    public void runFromFile(String fileLocation) throws Exception {
+    public Wekinator runFromFile(String fileLocation, boolean showOSCWindow) throws Exception {
         Wekinator w = WekinatorSaver.loadWekinatorFromFile(fileLocation);
         MainGUI mg = w.getMainGUI();
         mg.setVisible(true);
-        // mg.showOSCReceiverWindow();
-        w.getOSCReceiver().startListening();
+        if (showOSCWindow) {
+            mg.showOSCReceiverWindow();
+        }
         wekinatorCurrentMainFrames.put(w, mg);
         mg.addWindowListener(wl);
         w.addCloseListener(new ChangeListener() {
@@ -286,8 +287,9 @@ public final class WekiMiniRunner {
                 wekinatorCurrentMainFrames.remove((Wekinator) e.getSource());
             }
         });
-
+        return w;
     }
+
 
     public void registerForMacOSXEvents() {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
