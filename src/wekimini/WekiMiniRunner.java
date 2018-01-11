@@ -271,6 +271,7 @@ public final class WekiMiniRunner {
         if (showOSCWindow) {
             mg.showOSCReceiverWindow();
         }
+        w.getOSCReceiver().startListening();
         wekinatorCurrentMainFrames.put(w, mg);
         mg.addWindowListener(wl);
         w.addCloseListener(new ChangeListener() {
