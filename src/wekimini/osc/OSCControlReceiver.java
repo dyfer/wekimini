@@ -34,10 +34,10 @@ public class OSCControlReceiver {
     private final String deleteAllExamplesMessage = "/wekinator/control/deleteAllExamples";
     private final String deleteExamplesForOutputMessage = "/wekinator/control/deleteExamplesForOutput";
 
-    private final String enableModelRecordMessage = "/wekinator/control/enableModelRecording"; //List of model #s to enable (indexed from 1) 
-    private final String disableModelRecordMessage = "/wekinator/control/disableModelRecording"; //List of model #s to disable (indexed from 1) 
-    private final String enableModelRunMessage = "/wekinator/control/enableModelRunning"; //List of model #s to enable (indexed from 1) 
-    private final String disableModelRunMessage = "/wekinator/control/disableModelRunning"; //List of model #s to disable (indexed from 1) 
+    private final String enableModelRecordMessage = "/wekinator/control/enableModelRecording"; //List of model #s to enable (indexed from 1)
+    private final String disableModelRecordMessage = "/wekinator/control/disableModelRecording"; //List of model #s to disable (indexed from 1)
+    private final String enableModelRunMessage = "/wekinator/control/enableModelRunning"; //List of model #s to enable (indexed from 1)
+    private final String disableModelRunMessage = "/wekinator/control/disableModelRunning"; //List of model #s to disable (indexed from 1)
 
     // private final String setModelRecordEnabledMessage = "/wekinator/control/setModelRecordEnabled"; //1st argument model # (starting from 1), 2nd argument record boolean (0/1))
     //  private final String setModelRunEnabledMessage = "/wekinator/control/setModelRunEnabled"; //1st argument model # (starting from 1), 2nd argument run boolean (0/1))
@@ -50,10 +50,12 @@ public class OSCControlReceiver {
 
     private final String runNewProjectMessage = "/wekinator/control/runNewProject"; //First argument filename, second argument (optional) CLOSECURRENT/STOPCURRENTLISTENING/KEEPCURRENTRUNNING
 
+    private final String saveProjectMessage = "/wekinator/control/saveProject"; //no arguments, save project under the current filename. The project needs to be opened or saved as first.
+
     private final String enablePerformanceModeMessage = "/wekinator/control/enablePerformanceMode";
     private final String disablePerformanceModeMessage = "/wekinator/control/disablePerformanceMode";
 
-    
+
     public OSCControlReceiver(Wekinator w, OSCController controller) {
         this.w = w;
         this.controller = controller;
@@ -182,6 +184,7 @@ public class OSCControlReceiver {
         w.getOSCReceiver().addOSCListener(loadModelFromFileMessage, createModelLoadListener());
         w.getOSCReceiver().addOSCListener(saveModelToFileMessage, createModelSaveListener());
         w.getOSCReceiver().addOSCListener(runNewProjectMessage, runNewProjectListener());
+        w.getOSCReceiver().addOSCListener(saveProjectMessage, saveProjectListener());
         w.getOSCReceiver().addOSCListener(enablePerformanceModeMessage, enablePerformanceModeListener());
         w.getOSCReceiver().addOSCListener(disablePerformanceModeMessage, disablePerformanceModeListener());
 
@@ -576,6 +579,22 @@ public class OSCControlReceiver {
         return l;
     }
 
+    private OSCListener saveProjectListener() {
+        OSCListener l;
+        l = new OSCListener() {
+            @Override
+            public void acceptMessage(Date date, OSCMessage oscm) {
+                if (!controller.checkEnabled()) {
+                    return;
+                }
+                w.save();
+                w.getStatusUpdateCenter().update(this, "Current project saved");
+                // controller.enablePerformanceMode(true);
+            }
+        };
+        return l;
+    }
+
     private OSCListener enablePerformanceModeListener() {
         OSCListener l;
         l = new OSCListener() {
@@ -604,7 +623,7 @@ public class OSCControlReceiver {
         return l;
     }
 
-    
+
     private int[] unpackToInts(List<Object> o, int n, String msg) {
         if (o.size() != n) {
             w.getStatusUpdateCenter().warn(this, "Received wrong number of arguments for OSC message " + msg

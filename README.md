@@ -35,3 +35,11 @@ projects can be opened in this way.
 ```
 java -jar dist/WekiMini.jar /path/to/wek/project.wekproj /path/to/another/project.wekproj
 ```
+
+## Controlling Wekinator via OSC messages
+
+Please refer to <http://www.wekinator.org/detailed-instructions/#Controlling_Wekinator_via_OSC_messages>.
+
+Additionally, this fork allows:
+
+* __/wekinator/control/saveProject__ (no arguments): Save the current project (equivalent of selecting File -> Save). Project needs to be either opened or saved as first.
