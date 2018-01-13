@@ -1,0 +1,2 @@
+Fork of Wekinator enabling to open project from command line
+https://github.com/brannondorsey/wekimini
