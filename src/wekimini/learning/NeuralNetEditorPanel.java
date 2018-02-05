@@ -79,7 +79,7 @@ public class NeuralNetEditorPanel extends LearningModelBuilderEditorPanel {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel1.setText("# hidden layers:");
 
-        comboNumHidden.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3" }));
+        comboNumHidden.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
         comboNumHidden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboNumHiddenActionPerformed(evt);
@@ -210,7 +210,7 @@ public class NeuralNetEditorPanel extends LearningModelBuilderEditorPanel {
     private void updateForNumPerLayer() {
         textNumPerLayer.setEnabled(comboNumPerLayer.getSelectedIndex() == 1);
     }
-    
+
     private void updateForNum() {
         if (comboNumHidden.getSelectedIndex() == 0) {
             ((CardLayout) panelBottom.getLayout()).show(panelBottom, "cardBlank");
@@ -254,13 +254,13 @@ public class NeuralNetEditorPanel extends LearningModelBuilderEditorPanel {
         int i = mb.getNumHiddenLayers();
         comboNumHidden.setSelectedIndex(i);
         updateForNum();
-        
-        if (i == 0) 
+
+        if (i == 0)
             return;
-        
+
         if (mb.getHiddenLayerType() == HiddenLayerType.NUM_FEATURES) {
             comboNumPerLayer.setSelectedIndex(0);
-            
+
         } else {
             comboNumPerLayer.setSelectedIndex(1);
             textNumPerLayer.setText(Integer.toString(mb.getNumNodesPerHiddenLayer()));

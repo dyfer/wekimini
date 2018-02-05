@@ -30,7 +30,17 @@ x.free; ~inB.free; ~outB.free;
 */
 
 // ~makeWekinator =
-{arg projectID/*needs to be unique!*/, allProjectsPath = "../wekinator_projects".resolveRelative, wekiPath = "../wekinator/WekiMini.jar".resolveRelative, wekiSendOscPathPrepend = "/wek/outputs"/*projectID will be added to it*/, wekiReceiveOscPath = "/wek/inputs", receiveFunc = {}, inputBus, outputBus, busReadRate = 50/*Hz*/;
+{arg
+	projectID/*needs to be unique!*/,
+	allProjectsPath = "../wekinator_projects".resolveRelative,
+	wekiPath = "../wekinator/WekiMini.jar".resolveRelative,
+	wekiSendOscPathPrepend = "/wek/outputs"/*projectID will be added to it*/,
+	wekiReceiveOscPath = "/wek/inputs",
+	receiveFunc = {},
+	inputBus,
+	outputBus,
+	busReadRate = 50/*Hz*/
+	;
 
 	var setElementValue, getElementValue, getNumChildNodes, makeCopy, startWekinator, stopWekinator, checkForFileAndStart, makeCopyDialog, getFreePort, prepareAndStart, startResponder, stopResponder, cleanup;
 	var sendMsg, setOutputs, saveProject;
@@ -164,13 +174,16 @@ x.free; ~inB.free; ~outB.free;
 		dstFullPath = PathName(dstProject).pathOnly;//
 		oldProjectFilename = dstFullPath.withTrailingSlash ++ oldName; //after copying
 		// newProjectFilename = dstFullPath.withTrailingSlash ++ newName;
+		//making dir
+		"making dest directory".postln;
+		("mkdir" + dstFullPath.escapeChar($ )).postln.unixCmdGetStdOut;
 		newProjectFilename = dstProject;
-		cmd = "cp -R" + srcPathOnly + dstFullPath;
+		cmd = "cp -R" + srcPathOnly.escapeChar($ ) + dstFullPath.escapeChar($ );
 		cmd.postln;
 		"copying...".postln;
 		cmd.unixCmdGetStdOut;
 		//replace name
-		cmd = "mv" + oldProjectFilename + newProjectFilename;
+		cmd = "mv" + oldProjectFilename.escapeChar($ ) + newProjectFilename.escapeChar($ );
 		"renaming file...".postln;
 		cmd.postln;
 		cmd.unixCmdGetStdOut;
@@ -208,8 +221,8 @@ x.free; ~inB.free; ~outB.free;
 
 	startWekinator = {arg onClose = {};
 		var cmd;
-		cmd  = "java -jar " ++ wekiPath;
-		projectPath !? {cmd = cmd + projectPath};
+		cmd  = "java -jar " ++ wekiPath.escapeChar($ );
+		projectPath !? {cmd = cmd + projectPath.escapeChar($ )};
 		cmd.postln;
 		//kill old one
 		// stopWekinator.();
@@ -250,8 +263,19 @@ x.free; ~inB.free; ~outB.free;
 	};
 
 	stopWekinator = {
-		saveProject.();
-		{pid !? {("kill" + pid).unixCmd}}.defer(0.5); ///give time to save the project
+		var oldPid;
+		oldPid = pid;
+		{
+			(projectID ++ ": stopRunning").postln;
+			stopRunning.();
+			1.wait;
+			(projectID ++ ": saveProject").postln;
+			saveProject.();
+			5.wait;
+			(projectID ++ ": quit Wekinator").postln;
+			// {pid !? {("kill" + pid).unixCmd}}.defer(2); ///give time to save the project; 0.5 caused file corruption, increased to 2s!
+			oldPid !? {("kill" + oldPid).unixCmd}; //give time to save the project; 0.5 caused file corruption, increased; TEST THIS!
+		}.forkIfNeeded;
 	};
 
 	makeCopyDialog = {
@@ -277,7 +301,7 @@ x.free; ~inB.free; ~outB.free;
 
 	checkForFileAndStart = {//arg path; //proceed accordingly here
 		var path = projectPath;
-		// "path: ".postln; path.postln;
+		"path: ".postln; path.postln;
 		if(File.exists(path), {
 			projectFileExists = true;
 			//set ports, paths?
@@ -341,7 +365,7 @@ x.free; ~inB.free; ~outB.free;
 
 	cleanup = {
 		stopWekinator.();
-		stopStreaming .();
+		// stopStreaming.();
 		stopResponder.();
 	};
 
