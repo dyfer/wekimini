@@ -46,7 +46,7 @@ x.free; ~inB.free; ~outB.free;
 	var sendMsg, setOutputs, saveProject;
 	var setName, setReceivePort, setSendPort, setSendHostname, setSendOscPath, setReceiveOscPath;
 	var getNumInputs, getNumOutputs;
-	var startStreaming, stopStreaming, streamingRoutine, busReadRateReciprocal, startRunning, stopRunning;
+	var startStreaming, stopStreaming, streamingRoutine, busReadRateReciprocal, startRunning, stopRunning, enablePerformanceMode, disablePerformanceMode;
 	var projectPath, outputConfigPath, inputConfigPath;
 	var projectFileExists = false, wekinatorIsRunning = false;
 	var wekiSendOscPathFull;
@@ -262,6 +262,16 @@ x.free; ~inB.free; ~outB.free;
 		sendNetAddr !? {sendNetAddr.sendMsg(*fullMsg)};
 	};
 
+	enablePerformanceMode = {
+		var fullMsg = ["/wekinator/control/enablePerformanceMode"];
+		sendNetAddr !? {sendNetAddr.sendMsg(*fullMsg)};
+	};
+
+	disablePerformanceMode = {
+		var fullMsg = ["/wekinator/control/disablePerformanceMode"];
+		sendNetAddr !? {sendNetAddr.sendMsg(*fullMsg)};
+	};
+
 	stopWekinator = {
 		var oldPid;
 		oldPid = pid;
@@ -381,6 +391,8 @@ x.free; ~inB.free; ~outB.free;
 		outputBus_: {|self, bus| outputBus = bus}, //add check for number of channels?
 		startStreaming: {startStreaming.()},
 		stopStreaming: {stopStreaming.()},
+		enablePerformanceMode: {enablePerformanceMode.()},
+		disablePerformanceMode: {disablePerformanceMode.()},
 		numInputs: {numInputs},
 		numOutputs: {numOutputs},
 		saveProject: {saveProject.()}
